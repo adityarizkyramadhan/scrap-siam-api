@@ -2,6 +2,7 @@ package main
 
 import (
 	"errors"
+	"fmt"
 	"log"
 	"strings"
 
@@ -85,16 +86,8 @@ func (s *User) Login(us string, ps string) error {
 
 func (s *User) GetData() error {
 	//scraping data mahasiswas
-	result := make([]string, 9)
+	result := make([]string, 8)
 	s.c.OnHTML("div[class=\"bio-info\"]", func(h *colly.HTMLElement) {
-		h.ForEach("div", func(i int, h *colly.HTMLElement) {
-			each := strings.TrimSpace(h.Text)
-			if each != "PDDIKTI KEMDIKBUDDetail" {
-				result[i] = h.Text
-			}
-		})
-	})
-	s.c.OnHTML("div[class=\"photo-frame\"]", func(h *colly.HTMLElement) {
 		h.ForEach("div", func(i int, h *colly.HTMLElement) {
 			each := strings.TrimSpace(h.Text)
 			if each != "PDDIKTI KEMDIKBUDDetail" {
@@ -174,9 +167,30 @@ func main() {
 			log.Println(err.Error())
 			return
 		}
+		type Data struct {
+			NIM          string
+			Nama         string
+			Jenjang      string
+			Fakultas     string
+			Jurusan      string
+			ProgramStudi string
+			Seleksi      string
+			NomorUjian   string
+			FotoProfile  string
+		}
+		var data = Data{
+			NIM:          user.Account.NIM,
+			Nama:         user.Account.Nama,
+			Jenjang:      user.Account.Jenjang,
+			Fakultas:     user.Account.Fakultas,
+			ProgramStudi: user.Account.ProgramStudi,
+			Seleksi:      user.Account.Seleksi,
+			NomorUjian:   user.Account.NomorUjian,
+			FotoProfile:  fmt.Sprintf("https://siakad.ub.ac.id/dirfoto/foto/foto_20%s/%s.jpg", user.Account.NIM[0:2], user.Account.NIM),
+		}
 		ctx.JSON(200, gin.H{
 			"success": true,
-			"data":    user.Account,
+			"data":    data,
 		})
 	})
 	router.Run(":8081")
