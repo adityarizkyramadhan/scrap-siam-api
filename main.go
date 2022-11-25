@@ -143,9 +143,9 @@ var cORS = func() gin.HandlerFunc {
 
 func main() {
 	router := gin.Default()
-	user := NewUser()
 	router.Use(cORS())
 	router.POST("/auth", func(ctx *gin.Context) {
+		user := NewUser()
 		var input mahasiswa
 		err := ctx.ShouldBindJSON(&input)
 		if err != nil {
